@@ -7,8 +7,19 @@ import java.lang.*;
  
 public class Board extends JFrame
 {
-    public Board()
-    { 
+
+    public Board(){ };
+
+    public void init() {
+        this.bootstrapSudoku();
+    }
+
+    public void resetUI(JPanel panel) {
+        getRootPane().remove(panel);
+    }
+
+    public void bootstrapSudoku() {
+
         setSize(1100,600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridLayout(1,2));
@@ -16,15 +27,36 @@ public class Board extends JFrame
         String[] levels = { "Easy", "Medium", "Hard" };
         JComboBox difficultyBox = new JComboBox(levels);
         difficultyBox.setSelectedIndex(0);
-         
-        int N = 9, K = 20; 
+
+        // Generate Sudoku Board
+        Sudoku sudoku = this.generateSudokuBoard();
+
+        // Prepare the data transformation for Sudoku Board
+        int [][] result = this.transformSudokuBoardData(sudoku);
+
+        // Create parent element for all UI
+        JPanel p1 = new JPanel(new GridLayout(3,3));
+
+        // Map Sudoku mat values to board
+        this.populateSudokuBoard(lineBorder, result, p1);
+
+        // Build the UI for player
+        this.buildPlayerUI(difficultyBox, p1);
+    };
+
+    public Sudoku generateSudokuBoard() {
+        int N = 9, K = 20;
         Sudoku sudoku = new Sudoku(N, K);
         sudoku.fillValues();
         sudoku.printSudoku();
-         
+
+        return sudoku;
+    }
+
+    public int[][] transformSudokuBoardData(Sudoku sudoku) {
         int[][] mat = sudoku.getMat();
         int[][] result = new int[9][9];
-        
+
         // What row are we on
         int index = 0;
         // Beginning of range
@@ -35,73 +67,67 @@ public class Board extends JFrame
         int counter = 0;
         // How many ranges
         int totalRanges = 3;
-        
-        while (counter < (mat.length * totalRanges)) {
-           
-           for (int i = floor; i <= cap; i++) { 
-              result[index][i] = mat[index][i];
-           }
-           
-           if (index == 8) {
-             index = 0;
-             floor = floor + 3;
-             cap = cap + 3;
-           } else {
-             index++;
-           }
-           
-           counter++;
-        }
-        
-        System.out.println(counter);
-         
-        JPanel p2 = new JPanel(new GridLayout(3,3));
-        p2.setBorder(lineBorder);
-        
-        for (int x = 0; x < result.length; x++) {
-            for (int y = 0; y < result[x].length; y++) {
-               System.out.println(result[x][y]);
-            }
-        }
-        
-        //p2.add(new JTextField(Integer.toString(result[i][o]))); 
 
-        JPanel p1 =  new JPanel(new GridLayout(3,3));
-        
-        for (int k = 0; k <= 8; k++)
-        {
-            p2 = new JPanel(new GridLayout(3,3));   
-            p2.setBorder(lineBorder);
-            
-            for(int i = 0; i <= 8; i++)
-            {
-                p2.add(new JTextField(1));
+        while (counter < (mat.length * totalRanges)) {
+            for (int i = floor; i <= cap; i++) {
+                result[index][i] = mat[index][i];
             }
-            
-            for(int i = 0; i <= 8; i++)
-            {
-                p1.add(p2);
-            }     
+            if (index == 8) {
+                index = 0;
+                floor = floor + 3;
+                cap = cap + 3;
+            } else {
+                index++;
+            }
+            counter++;
         }
-        
+        return result;
+    }
+
+    public void buildPlayerUI(JComboBox difficultyBox, JPanel p1) {
         JPanel Buttons = new JPanel(new GridLayout(5,1));
-        Buttons.add(new JButton("New Puzzle"));
+        JButton newPuzzle = new JButton("New Puzzle");
+        Board self = this;
+        newPuzzle.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e)
+                {
+                    self.resetUI(p1);
+                    self.bootstrapSudoku();
+                }
+            }
+        );
+        Buttons.add(newPuzzle);
         Buttons.add(new JButton("Hint"));
         Buttons.add(new JButton("Solve"));
         Buttons.add(new JButton("Reset"));
         Buttons.add(difficultyBox);
-        
+
         add(p1);
         add(Buttons);
         setVisible(true);
     }
+
+    public void populateSudokuBoard(Border lineBorder, int[][] data, JPanel p1) {
+        JPanel p2 = new JPanel(new GridLayout(3,3));
+
+        p2.setBorder(lineBorder);
+
+        for (int k = 0; k <= 8; k++) {
+            p2 = new JPanel(new GridLayout(3,3));
+            p2.setBorder(lineBorder);
+            for (int i = 0; i <= 8; i++) {
+                String number = Integer.toString(data[k][i]);
+                p2.add(new JTextField(number.equals("0") ? "" : number));
+                p1.add(p2);
+            }
+        }
+    }
     
-    public static void main(String[] args)
-    {
-        Board Sud = new Board();
-        
-     } 
-  }
+    public static void main(String[] args) {
+        Board sud = new Board();
+        sud.init();
+    }
+}
    
 
 

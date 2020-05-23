@@ -21,6 +21,11 @@ public class Sudoku extends JFrame
         SRN = SRNd.intValue(); 
   
         mat = new int[N][N]; 
+    }
+    
+    public int[][] getMat()
+    {
+      return this.mat;
     } 
   
     // Sudoku Generator 
@@ -35,11 +40,7 @@ public class Sudoku extends JFrame
         // Remove Randomly K digits to make game 
         removeKDigits(); 
        
-    }
-
-    public int[][] getMat() {
-        return this.mat;
-    }
+    } 
   
     // Fill the diagonal SRN number of SRN x SRN matrices 
     void fillDiagonal() 
@@ -214,42 +215,20 @@ public class Sudoku extends JFrame
             System.out.println(); 
         } 
         System.out.println(); 
-    } 
+    }
    
   
     // Driver code 
     public static void main(String[] args) 
     { 
        
-        int[][] mat = {{1, 2, 3, 4, 5, 6, 7, 8, 9},
-                       {1, 2, 3, 4, 5, 6, 7, 8, 9},
-                       {1, 2, 3, 4, 5, 6, 7, 8, 9}};
-             
-         int[][][] result = new int [9][9][3];
-         
-         int[][] value = new int [9][9];   
-   
-         for (int i = 0; i < mat.length; i++) 
-         {
-              int beg = 0;
-              int end = 3;
-              int destinationIndex = 0;
-               
-              int length = Arrays.copyOfRange(mat[i], beg, end).length;
-              
-              while(length > 0) 
-              {
-                  result[i][destinationIndex] = Arrays.copyOfRange(mat[i], beg, end);
-                  beg = beg + 3;
-                  end = end + 3;
-      
-                  destinationIndex++;
-              int N = 9, K = 20; 
-              Sudoku sudoku = new Sudoku(N, K); 
-              sudoku.fillValues(); 
-              sudoku.printSudoku(); 
-              } 
-           } 
+           
+           //for (int l = 0; l < value.length; l++) {
+           //   System.out.println(value[l]);
+           //}
+           
+
+           //sudoku.printSudoku(); 
         }
      }
      
