@@ -14,8 +14,12 @@ public class Board extends JFrame
         this.bootstrapSudoku();
     }
 
-    public void resetUI(JPanel panel) {
-        getRootPane().remove(panel);
+    public void resetUI(JPanel p1) {
+        removeAll();
+        setContentPane(p1);
+        validate();
+        repaint();
+        setVisible(true);
     }
 
     public void bootstrapSudoku() {
@@ -53,6 +57,11 @@ public class Board extends JFrame
         return sudoku;
     }
 
+//    public int[][] parseBlocks(int[][] data, int counter){
+//        int [][] result = new int[9][9];
+//        return (result[result.length - 1] != null) ? parseBlocks(data, counter) : data;
+//    }
+
     public int[][] transformSudokuBoardData(Sudoku sudoku) {
         int[][] mat = sudoku.getMat();
         int[][] result = new int[9][9];
@@ -67,15 +76,25 @@ public class Board extends JFrame
         int counter = 0;
         // How many ranges
         int totalRanges = 3;
+        // Current Index
+        int currIndex = 0;
+        // Current index 2
+        int currIndex2 = 0;
 
         while (counter < (mat.length * totalRanges)) {
             for (int i = floor; i <= cap; i++) {
-                result[index][i] = mat[index][i];
+                int number = mat[index][i];
+                result[currIndex][currIndex2] = number;
+                currIndex2++;
+                if (currIndex2 == 8) {
+                    currIndex2 = 0;
+                }
             }
             if (index == 8) {
                 index = 0;
                 floor = floor + 3;
                 cap = cap + 3;
+                currIndex++;
             } else {
                 index++;
             }
@@ -128,220 +147,3 @@ public class Board extends JFrame
         sud.init();
     }
 }
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-public class Sudoku extends JFrame
-{ 
-    int[] mat[]; 
-    int N; 
-    int SRN; 
-    int K; 
-    
-    Sudoku(int N, int K) 
-    { 
-        this.N = N; 
-        this.K = K; 
-  
-        Double SRNd = Math.sqrt(N); 
-        SRN = SRNd.intValue(); 
-        mat = new int[N][N]; 
-    } 
-  
-    public void fillValues() 
-    { 
-        fillDiagonal(); 
-        fillRemaining(0, SRN); 
-        removeKDigits(); 
-    } 
-
-    boolean unUsedInBox(int rowStart, int colStart, int num) 
-    { 
-        for (int i = 0; i<SRN; i++) 
-            for (int j = 0; j<SRN; j++) 
-                if (mat[rowStart+i][colStart+j]==num) 
-                    return false; 
-        return true; 
-    } 
-   
-    void fillBox(int row,int col) 
-    { 
-        int num; 
-        for (int i=0; i<SRN; i++) 
-        { 
-            for (int j=0; j<SRN; j++) 
-            { 
-                do
-                { 
-                    num = randomGenerator(N); 
-                } 
-                while (!unUsedInBox(row, col, num)); 
-                mat[row+i][col+j] = num; 
-            } 
-        } 
-    } 
-    
-    int randomGenerator(int num) 
-    { 
-        return (int) Math.floor((Math.random()*num+1)); 
-    } 
-  
-    boolean CheckIfSafe(int i,int j,int num) 
-    { 
-        return (unUsedInRow(i, num) && 
-                unUsedInCol(j, num) && 
-                unUsedInBox(i-i%SRN, j-j%SRN, num)); 
-    } 
-
-    boolean unUsedInRow(int i,int num) 
-    { 
-        for (int j = 0; j<N; j++) 
-           if (mat[i][j] == num) 
-                return false; 
-        return true; 
-    } 
-
-    boolean unUsedInCol(int j,int num) 
-    { 
-        for (int i = 0; i<N; i++) 
-            if (mat[i][j] == num) 
-                return false; 
-        return true; 
-    } 
-
-    boolean fillRemaining(int i, int j) 
-    { 
-        if (j>=N && i<N-1) 
-        { 
-            i = i + 1; 
-            j = 0; 
-        } 
-        if (i>=N && j>=N) 
-            return true; 
-  
-        if (i < SRN) 
-        { 
-            if (j < SRN) 
-                j = SRN; 
-        } 
-        else if (i < N-SRN) 
-        { 
-            if (j==(int)(i/SRN)*SRN) 
-                j =  j + SRN; 
-        } 
-        else
-        { 
-            if (j == N-SRN) 
-            { 
-                i = i + 1; 
-                j = 0; 
-                if (i>=N) 
-                    return true; 
-            } 
-        } 
-  
-        for (int num = 1; num<=N; num++) 
-        { 
-            if (CheckIfSafe(i, j, num)) 
-            { 
-                mat[i][j] = num; 
-                if (fillRemaining(i, j+1)) 
-                    return true; 
-  
-                mat[i][j] = 0; 
-            } 
-        } 
-        return false; 
-    } 
-
-    public void removeKDigits() 
-    { 
-        int count = K; 
-        while (count != 0) 
-        { 
-            int cellId = randomGenerator(N * N); 
-            int i = (cellId/N); 
-            int j = cellId%9; 
-            if (j != 0) 
-                j = j - 1; 
-
-            if (mat[i][j] != 0) 
-            { 
-                count--; 
-                mat[i][j] = 0; 
-            } 
-        } 
-    } 
-    
-   public void Board(String[] args) 
-   {
-      new Sudoku().setVisible(true);
-   }
-   
-   private Sudoku()
-   {
-      super("Sudoku Puzzle");
-      setSize(1100, 600);
-      setResizable(false);
-      setDefaultCloseOperation(EXIT_ON_CLOSE);
-   }
-   
-    public void printSudoku() 
-    { 
-        for (int i = 0; i<N; i++) 
-        { 
-            for (int j = 0; j<N; j++) 
-                System.out.print(mat[i][j] + " "); 
-            System.out.println(); 
-        } 
-        System.out.println(); 
-    } 
-  
-    public static void main(String[] args) 
-    { 
-        int N = 9, K = 20; 
-        Sudoku sudoku = new Sudoku(N, K); 
-        sudoku.fillValues(); 
-        sudoku.printSudoku(); 
-    } 
-} */
-
-//*******************************************************//
-// here I was just trying to set font and text (didnt work lol)
-
-         /* for(int i =0; i <=8; i++)
-            {
-               JTextField tf = new JTextField(1);
-               tf.setHorizontalAlignment(JTextField.CENTER); 
-                   p2.add(tf);
-            }  */
-            
-            
-                  
-       /* create new Font
-        Font font = new Font("Courier", Font.BOLD,12);
-        //set font for JTextField
-        tf.setFont(font);*/
