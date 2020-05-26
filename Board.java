@@ -78,13 +78,17 @@ public class Board extends JFrame
 
         solve.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ArrayList<String> entries = new ArrayList<>();
-                for (int i = 0; i < self.UIElements.size(); i++) {
-                    entries.add(self.UIElements.get(i).getText());
+                ArrayList<String> values = new ArrayList<>();
+                for (JPanel panel : self.UIElements) {
+                    Component[] components = panel.getComponents();
+                    for (Component comp : components) {
+                        // Cast comp to JComboBox / JTextField to get the values
+                        if (comp instanceof JTextField) {
+                            JTextField textField = (JTextField) comp;
+                            values.add(textField.getText());
+                        }
+                    }
                 }
-
-                // Then send to some function to total the values / analysis
-                // Probably the functions in the sudoku class for checking in row etc
             }
         });
 
