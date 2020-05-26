@@ -1,6 +1,6 @@
 import javax.swing.JFrame;
 import java.lang.*;
-import java.util.Arrays;
+import java.util.Array;
 
 // Sudoku generator    
 public class Sudoku extends JFrame {
@@ -172,7 +172,7 @@ public class Sudoku extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    // Print sudoku 
+    // Print sudoku
     public void printSudoku() {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++)
