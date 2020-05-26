@@ -4,10 +4,13 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.JFrame;
 import java.lang.*;
- 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.awt.GraphicsConfiguration;
+
 public class Board extends JFrame
 {
-
+    public JFrame frame;
     public Board(){ };
 
     public void init() {
@@ -16,13 +19,15 @@ public class Board extends JFrame
 
     public void resetUI(JPanel p1) {
         removeAll();
-        setContentPane(p1);
         validate();
         repaint();
         setVisible(true);
     }
-
     public void bootstrapSudoku() {
+
+        JFrame frame = new JFrame("Poop");
+
+        this.frame = frame;
 
         setSize(1100,600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -35,14 +40,11 @@ public class Board extends JFrame
         // Generate Sudoku Board
         Sudoku sudoku = this.generateSudokuBoard();
 
-        // Prepare the data transformation for Sudoku Board
-        int [][] result = this.transformSudokuBoardData(sudoku);
-
         // Create parent element for all UI
         JPanel p1 = new JPanel(new GridLayout(3,3));
 
         // Map Sudoku mat values to board
-        this.populateSudokuBoard(lineBorder, result, p1);
+        this.populateSudokuBoard(lineBorder, sudoku, p1);
 
         // Build the UI for player
         this.buildPlayerUI(difficultyBox, p1);
@@ -55,52 +57,6 @@ public class Board extends JFrame
         sudoku.printSudoku();
 
         return sudoku;
-    }
-
-//    public int[][] parseBlocks(int[][] data, int counter){
-//        int [][] result = new int[9][9];
-//        return (result[result.length - 1] != null) ? parseBlocks(data, counter) : data;
-//    }
-
-    public int[][] transformSudokuBoardData(Sudoku sudoku) {
-        int[][] mat = sudoku.getMat();
-        int[][] result = new int[9][9];
-
-        // What row are we on
-        int index = 0;
-        // Beginning of range
-        int floor = 0;
-        // End of range
-        int cap = 2;
-        // Track the number of iterations
-        int counter = 0;
-        // How many ranges
-        int totalRanges = 3;
-        // Current Index
-        int currIndex = 0;
-        // Current index 2
-        int currIndex2 = 0;
-
-        while (counter < (mat.length * totalRanges)) {
-            for (int i = floor; i <= cap; i++) {
-                int number = mat[index][i];
-                result[currIndex][currIndex2] = number;
-                currIndex2++;
-                if (currIndex2 == 8) {
-                    currIndex2 = 0;
-                }
-            }
-            if (index == 8) {
-                index = 0;
-                floor = floor + 3;
-                cap = cap + 3;
-                currIndex++;
-            } else {
-                index++;
-            }
-            counter++;
-        }
-        return result;
     }
 
     public void buildPlayerUI(JComboBox difficultyBox, JPanel p1) {
@@ -116,8 +72,16 @@ public class Board extends JFrame
             }
         );
         Buttons.add(newPuzzle);
+        JButton solve = new JButton("Solve");
+
+        solve.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
         Buttons.add(new JButton("Hint"));
-        Buttons.add(new JButton("Solve"));
+        Buttons.add(solve);
         Buttons.add(new JButton("Reset"));
         Buttons.add(difficultyBox);
 
@@ -126,20 +90,43 @@ public class Board extends JFrame
         setVisible(true);
     }
 
-    public void populateSudokuBoard(Border lineBorder, int[][] data, JPanel p1) {
+    public void populateSudokuBoard(Border lineBorder, Sudoku sudoku, JPanel p1) {
         JPanel p2 = new JPanel(new GridLayout(3,3));
 
         p2.setBorder(lineBorder);
 
-        for (int k = 0; k <= 8; k++) {
+        int counter = 0;
+        int[][] mat = sudoku.getMat();
+
+        int xOffset = 0, yOffset = 0;
+        while (counter < 9) {
             p2 = new JPanel(new GridLayout(3,3));
             p2.setBorder(lineBorder);
+            ArrayList<Integer> block = this.getBlock(mat, xOffset, yOffset, 3);
             for (int i = 0; i <= 8; i++) {
-                String number = Integer.toString(data[k][i]);
+                String number = Integer.toString(block.get(i));
                 p2.add(new JTextField(number.equals("0") ? "" : number));
                 p1.add(p2);
             }
+            if (xOffset == 6) {
+                xOffset = 0;
+                yOffset = yOffset + 3;
+            } else {
+                xOffset = xOffset + 3;
+            }
+            counter++;
         }
+    }
+
+    public ArrayList<Integer> getBlock(int[][] data, int xOffset, int yOffset, int size) {
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        for (int i = 0; i < size; i++) {
+            int[] copy = data [i + yOffset];
+            for (int j = xOffset; j < xOffset + size; j++) {
+                result.add(copy[j]);
+            }
+        }
+        return result;
     }
     
     public static void main(String[] args) {
