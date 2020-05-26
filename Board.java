@@ -10,6 +10,7 @@ import java.awt.GraphicsConfiguration;
 
 public class Board extends JFrame
 {
+    private ArrayList<JPanel> UIElements;
     public JFrame frame;
     public Board(){ };
 
@@ -63,6 +64,7 @@ public class Board extends JFrame
         JPanel Buttons = new JPanel(new GridLayout(5,1));
         JButton newPuzzle = new JButton("New Puzzle");
         Board self = this;
+
         newPuzzle.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e)
                 {
@@ -76,7 +78,13 @@ public class Board extends JFrame
 
         solve.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                ArrayList<String> entries = new ArrayList<>();
+                for (int i = 0; i < self.UIElements.size(); i++) {
+                    entries.add(self.UIElements.get(i).getText());
+                }
 
+                // Then send to some function to total the values / analysis
+                // Probably the functions in the sudoku class for checking in row etc
             }
         });
 
@@ -97,6 +105,7 @@ public class Board extends JFrame
 
         int counter = 0;
         int[][] mat = sudoku.getMat();
+        ArrayList<JPanel> UIElements = new ArrayList<>();
 
         int xOffset = 0, yOffset = 0;
         while (counter < 9) {
@@ -115,11 +124,14 @@ public class Board extends JFrame
                 xOffset = xOffset + 3;
             }
             counter++;
+            UIElements.add(p2);
         }
+
+        this.UIElements = UIElements;
     }
 
     public ArrayList<Integer> getBlock(int[][] data, int xOffset, int yOffset, int size) {
-        ArrayList<Integer> result = new ArrayList<Integer>();
+        ArrayList<Integer> result = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             int[] copy = data [i + yOffset];
             for (int j = xOffset; j < xOffset + size; j++) {
